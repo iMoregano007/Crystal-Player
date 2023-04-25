@@ -18,8 +18,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -28,6 +32,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -81,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
     BlurImageView blurImageView;
     int defaultStatusColor;
     int repeatMode = 1;
+    SearchView searchView;
+    boolean isBound = false;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,11 +111,11 @@ public class MainActivity extends AppCompatActivity {
            }
         });
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
-            storagePermissionLauncher.launch(permissionAudio);
-        } else {
-            storagePermissionLauncher.launch(permission);
-        }
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+//            storagePermissionLauncher.launch(permissionAudio);
+//        } else {
+//            storagePermissionLauncher.launch(permission);
+//        }
 
         recordAudioPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted->{
            if (granted && player.isPlaying()){
@@ -118,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
            }
         });
 
-        player = new ExoPlayer.Builder(this).build();
+//        player = new ExoPlayer.Builder(this).build();
         playerView = findViewById(R.id.playerView);
         playerCloseBtn = findViewById(R.id.playerCloseBtn);
         songNameView = findViewById(R.id.songNameView);
@@ -144,9 +151,38 @@ public class MainActivity extends AppCompatActivity {
         audioVisualizer = findViewById(R.id.visualizer);
         blurImageView = findViewById(R.id.blurImageView);
         
-        playerControls();
+//        playerControls();
+
+        doBindService();
+
 
     }
+
+    private void doBindService() {
+        Intent playerServiceIntent = new Intent(this, PlayerService.class);
+        bindService(playerServiceIntent, playerServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    ServiceConnection playerServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            PlayerService.ServiceBinder binder = (PlayerService.ServiceBinder) service;
+            player = binder.getPlayerService().player;
+            isBound = true;
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+                storagePermissionLauncher.launch(permissionAudio);
+            } else {
+                storagePermissionLauncher.launch(permission);
+            }
+
+            playerControls();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     @SuppressLint("SuspiciousIndentation")
     @Override
@@ -450,10 +486,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        if(player.isPlaying()){
-            player.stop();
+//        if(player.isPlaying()){
+//            player.stop();
+//        }
+//        player.release();
+
+        doUnbindService();
+    }
+
+    private void doUnbindService() {
+        if(isBound){
+            unbindService(playerServiceConnection);
+            isBound = false;
         }
-        player.release();
     }
 
     private void userResponses() {
@@ -589,7 +634,7 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.search_btn, menu);
 
         MenuItem menuItem = menu.findItem(R.id.searchBtn);
-        SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView = (SearchView) menuItem.getActionView();
 
         SearchSong(searchView);
 

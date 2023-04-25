@@ -3,6 +3,7 @@ package com.imoregano007.crystalplayer;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.SearchView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -67,6 +69,13 @@ public class SongAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
 
         viewHolder.itemView.setOnClickListener(view -> {
+            context.startService(new Intent(context.getApplicationContext(), PlayerService.class));
+
+            SearchView searchView = ((MainActivity)context).searchView;
+            if(searchView != null)
+                searchView.clearFocus();
+
+
             playerView.setVisibility(View.VISIBLE);
             if (!player.isPlaying()){
                 player.setMediaItems(getMediaItems(), position, 0);
