@@ -66,8 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     ActivityResultLauncher<String> storagePermissionLauncher;
+//    ActivityResultLauncher<String> postNotificationPermissionLauncher;
     final String permission = Manifest.permission.READ_EXTERNAL_STORAGE;
     final String permissionAudio = Manifest.permission.READ_MEDIA_AUDIO;
+//    final String permissionPostNotification = Manifest.permission.POST_NOTIFICATIONS;
 
     ExoPlayer player;
     ActivityResultLauncher<String> recordAudioPermissionLauncher;
@@ -125,6 +127,16 @@ public class MainActivity extends AppCompatActivity {
            }
         });
 
+//        postNotificationPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), granted ->{
+//            if(granted){
+//                Toast.makeText(this, "Notification Permission Granted", Toast.LENGTH_SHORT).show();
+//            } else {
+//                userNotificationPermissionResponses();
+//            }
+//        });
+
+
+
 //        player = new ExoPlayer.Builder(this).build();
         playerView = findViewById(R.id.playerView);
         playerCloseBtn = findViewById(R.id.playerCloseBtn);
@@ -157,6 +169,37 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+//    private void userNotificationPermissionResponses() {
+//        if(ContextCompat.checkSelfPermission(this, permissionPostNotification) == PackageManager.PERMISSION_GRANTED){
+//            Toast.makeText(this, "Notification Permission Granted", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            if (shouldShowRequestPermissionRationale(permissionPostNotification)){
+//                new AlertDialog.Builder(this)
+//                        .setTitle("Requesting Permission")
+//                        .setMessage("Allow us to sent Notifications on your device")
+//                        .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                postNotificationPermissionLauncher.launch(permissionPostNotification);
+//                            }
+//                        })
+//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                Toast.makeText(getApplicationContext(), "You denied us to sent Notifications", Toast.LENGTH_SHORT).show();
+//                                dialog.dismiss();
+//                            }
+//                        })
+//                        .show();
+//            }
+//
+//        } else {
+//            Toast.makeText(getApplicationContext(), "You denied us to sent Notifications", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private void doBindService() {
         Intent playerServiceIntent = new Intent(this, PlayerService.class);
@@ -504,27 +547,29 @@ public class MainActivity extends AppCompatActivity {
     private void userResponses() {
         if(ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED){
             fetchSongs();
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (shouldShowRequestPermissionRationale(permission)){
-                new AlertDialog.Builder(this)
-                        .setTitle("Requesting Permission")
-                        .setMessage("Allow us to fetch songs on your device")
-                        .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                storagePermissionLauncher.launch(permission);
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Toast.makeText(getApplicationContext(), "You denied us to show songs", Toast.LENGTH_SHORT).show();
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+          }
+//        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (shouldShowRequestPermissionRationale(permission)){
+//                new AlertDialog.Builder(this)
+//                        .setTitle("Requesting Permission")
+//                        .setMessage("Allow us to fetch songs on your device")
+//                        .setPositiveButton("Allow", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                storagePermissionLauncher.launch(permission);
+//                            }
+//                        })
+//                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                Toast.makeText(getApplicationContext(), "You denied us to show songs", Toast.LENGTH_SHORT).show();
+//                                dialog.dismiss();
+//                            }
+//                        })
+//                        .show();
+//            }
+//        }
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (shouldShowRequestPermissionRationale(permissionAudio)){
                 new AlertDialog.Builder(this)
                         .setTitle("Requesting Permission")

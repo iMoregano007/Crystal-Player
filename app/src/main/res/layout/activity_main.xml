@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@drawable/app_bg">
+    android:background="#85302F2F">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
